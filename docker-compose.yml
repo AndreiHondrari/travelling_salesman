@@ -1,0 +1,82 @@
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: web
+
+    depends_on:
+      - db
+      - optimisation_service
+      - bugsbunny
+
+    networks:
+      - db
+      - messagequeue
+
+    volumes:
+      - ./web/optimisation_web:/optimisation_web
+
+  db:
+    image: postgres
+    restart: always
+
+    environment:
+      POSTGRES_PASSWORD: topsecret
+
+    networks:
+      - db
+
+  optimisation_service:
+    build:
+      context: optimisation_service
+
+    depends_on:
+      - bugsbunny
+
+    environment:
+      - PYTHONPATH=/code/offsec_platform
+      - C_FORCE_ROOT=true
+
+    networks:
+      - messagequeue
+
+    volumes:
+      - ./optimisation_service/worker:/worker
+
+  bugsbunny:
+    image: rabbitmq:3-management
+
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+    networks:
+      - messagequeue
+
+    volumes:
+      - bugsbunny_data:/data
+
+  flower:
+    image: mher/flower
+
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbit:5672//
+      - FLOWER_PORT=5555
+
+    ports:
+      - 5555:5555
+
+    depends_on:
+      - bugsbunny
+
+  redis:
+    image: redis:6.0
+
+networks:
+  db:
+  messagequeue:
+
+
+volumes:
+  bugsbunny_data:
