@@ -139,10 +139,6 @@ services:
     depends_on:
       - bugsbunny
 
-  # Caching backend
-  redis:
-    image: redis:6.0
-
 networks:
   db:
   messagequeue:
