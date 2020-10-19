@@ -16,7 +16,7 @@ services:
       PYTHONPATH: /optimisation_web
 
     ports:
-      - 8000:8000
+      - 8005:8005
 
     networks:
       - db
@@ -27,8 +27,6 @@ services:
 
     volumes:
       - ./web/:/optimisation_web
-
-    command: python manage.py runserver 0.0.0.0:8000
 
     stdin_open: true
     tty: true
@@ -48,29 +46,6 @@ services:
     depends_on:
       - bugsbunny
       - db
-
-    command: celery -A optimisation_web.celery.app worker -l INFO
-
-    stdin_open: true
-    tty: true
-
-  # Optimisation web service - celery beat
-  celery_beat:
-    build:
-      context: web
-
-    networks:
-      - db
-      - messagequeue
-
-    volumes:
-      - ./web/:/optimisation_web
-
-    depends_on:
-      - bugsbunny
-      - db
-
-    command: celery -A optimisation_web.celery.app beat -l INFO
 
     stdin_open: true
     tty: true
