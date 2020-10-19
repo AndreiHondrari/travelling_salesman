@@ -18,7 +18,7 @@ class LocationsField(rest_serializers.Field):
             if len(elem) != 2:
                 raise rest_exceptions.ValidationError("Location tuples must be consisting of exactly two coordinates")
 
-            if not isinstance(elem[0], (int, float,)) or not isinstance(elem[1], (int, float,)):
+            if type(elem[0]) not in (int, float,) or type(elem[1]) not in (int, float,):
                 raise rest_exceptions.ValidationError("Locations coordinates must be numbers")
 
         return data

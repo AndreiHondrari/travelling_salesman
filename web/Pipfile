@@ -5,6 +5,8 @@ pytest-xdist = "*"
 pytest-django = "*"
 faker = "*"
 flake8 = "*"
+pytest-cov = "*"
+pytest-mock = "*"
 
 [packages]
 psycopg2 = "*"
