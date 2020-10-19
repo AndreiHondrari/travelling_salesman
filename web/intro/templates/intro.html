@@ -35,6 +35,22 @@
             Password: <strong>Superpass1234</strong>
         </p>
 
+        <h2 class="mt-4">Django Admin</h2>
+        <p>The django admin dashboard can be accessed <a href="{% url 'admin:index' %}" target="_blank">here</a></p>
+
+        <h2 class="mt-4">RabbitMQ</h2>
+        <h5>Credentials</h5>
+        <p>
+            Username: <strong>guest</strong><br/>
+            Password: <strong>guest</strong>
+        </p>
+
+        <h5>Dashboards</h5>
+        <p>
+            To explore the RabbitMQ message queues go to <a href="http://localhost:15672/" target="_blank">RabbitMQ management dashboard</a></br>
+            RabbitMQ message queues can also be explored via  <a href="http://localhost:5555/" target="_blank">Flower</a>
+        </p>
+
         <h2 class="mt-4">Shortest path jobs</h2>
         <p>
             To start submitting locations for solving go to: <a href="{% url 'jobs:shortest-path-jobs-list' %}" target="_blank">{% url 'jobs:shortest-path-jobs-list' %}</a><br/>
@@ -204,25 +220,9 @@
 
         <p>
             Obviously the endpoint can be called from a client like <strong>Postman</strong> but first you need to
-            create an authorization token via <strong>Django Admin</strong> (see details in the following section).
+            create an authorization token via <strong>Django Admin</strong>.
             After a token was created just make sure to append the following header in your requests:
             <code class="text-light bg-dark">Authorization: Token *your token code*</code>
-        </p>
-
-        <h2 class="mt-4">Django Admin</h2>
-        <p>The django admin dashboard can be accessed <a href="{% url 'admin:index' %}" target="_blank">here</a></p>
-
-        <h2 class="mt-4">RabbitMQ</h2>
-        <h5>Credentials</h5>
-        <p>
-            Username: <strong>guest</strong><br/>
-            Password: <strong>guest</strong>
-        </p>
-
-        <h5>Dashboards</h5>
-        <p>
-            To explore the RabbitMQ message queues go to <a href="http://localhost:15672/" target="_blank">RabbitMQ management dashboard</a></br>
-            RabbitMQ message queues can also be explored via  <a href="http://localhost:5555/" target="_blank">Flower</a>
         </p>
 
         <h2 class="mt-4">Credits</h2>
