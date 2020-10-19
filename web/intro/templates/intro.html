@@ -1,20 +1,182 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Travelling Salesman API</title>
 
-    <style>
-        #main {
-            width: 50%;
-        }
-    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
 </head>
 <body>
-    <div id="main">
+    <div class="container mt-5 mb-5">
         <h1>Welcome to the travelling salesman API</h1>
 
-        <p>To start submitting locations for solving go to: <a href="{% url 'jobs:shortest-path-jobs-list' %}">{% url 'jobs:shortest-path-jobs-list' %}</a></p>
+        <hr>
+        <img width="150" src="{% static 'businessman.svg' %}"/>
+        <hr>
+
+        <h2>Overview</h2>
+        <p>
+            This service provides the calculation of the shortest path. All that you need to do is:
+            <ol>
+                <li>Submit a list of locations</li>
+                <li>Wait for the route to be calculated</li>
+                <li>Fetch the results</li>
+            </ol>
+        </p>
+
+        <h2>Superuser credentials</h2>
+        <p>
+            Username: <strong>admin</strong><br/>
+            Email: <strong>admin@example.com</strong><br/>
+            Password: <strong>Superpass1234</strong>
+        </p>
+
+        <h2 class="mt-4">Shortest path jobs</h2>
+        <p>
+            To start submitting locations for solving go to: <a href="{% url 'jobs:shortest-path-jobs-list' %}" target="_blank">{% url 'jobs:shortest-path-jobs-list' %}</a><br/>
+            You might want to login in the Django REST framework browsable API with the aforementioned superuser credentials in order to start taking advantage of the optimisation service.
+        </p>
+
+        <p>In order to start testing the service, try inputting the following locations:</p>
+<pre class="text-light bg-dark">
+{
+    "locations": [
+           [10, 10],
+           [10, 12],
+           [100, 500],
+           [22, 30]
+    ]
+}
+</pre>
+
+        <p>By default the route is calculated for 1 vehicle, starting from the first location.</p>
+        <p>After the job was created a background task is being launched to calculate your route and a pending job is returned:</p>
+
+<pre class="text-light bg-dark">
+{
+    "uuid": "fa163129-5a35-4dff-a714-b47ff4a698b5",
+    "status": "pending",
+    "result": "",
+    "locations": [
+        [
+            10,
+            10
+        ],
+        [
+            10,
+            12
+        ],
+        [
+            100,
+            500
+        ],
+        [
+            22,
+            30
+        ]
+    ],
+    "num_vehicles": 1,
+    "starting_location": 0,
+    "href": "http://localhost:8005/api/shortest-path-jobs/fa163129-5a35-4dff-a714-b47ff4a698b5/"
+}
+</pre>
+
+        <p>
+            After a while the task is completed and the result is persisted on the specific job database entry,
+            and by following the hyperlink for the job <code>http://localhost:8005/api/shortest-path-jobs/*job UUID*</code>
+            you will be able to see the result as such:
+        </p>
+
+<pre class="text-light bg-dark">
+{
+    "uuid": "fa163129-5a35-4dff-a714-b47ff4a698b5",
+    "status": "pending",
+    "result": "",
+    "locations": [
+        [
+            10,
+            10
+        ],
+        [
+            10,
+            12
+        ],
+        [
+            100,
+            500
+        ],
+        [
+            22,
+            30
+        ]
+    ],
+    "num_vehicles": 1,
+    "starting_location": 0,
+    "href": "http://localhost:8005/api/shortest-path-jobs/fa163129-5a35-4dff-a714-b47ff4a698b5/"
+}
+</pre>
+
+        <p>
+            Alternatively you could provide more options for configuring the:
+            <ul>
+                <li>number of vehicles</li>
+                <li>starting point</li>
+            </ul>
+            Example:
+        </p>
+
+<pre class="text-light bg-dark">
+{
+    "locations": [
+           [10, 10],
+           [10, 12],
+           [100, 500],
+           [22, 30]
+    ],
+    "num_vehicles": 1,
+    "starting_location": 0
+}
+</pre>
+
+        <p>
+            Obviously the endpoint can be called from a client like <strong>Postman</strong> but first you need to
+            create an authorization token via <strong>Django Admin</strong> (see details in the following section).
+            After a token was created just make sure to append the following header in your requests:
+            <code class="text-light bg-dark">Authorization: Token *your token code*</code>
+        </p>
+
+        <h2 class="mt-4">Django Admin</h2>
+        <p>The django admin dashboard can be accessed <a href="{% url 'admin:index' %}" target="_blank">here</a></p>
+
+        <h2 class="mt-4">RabbitMQ</h2>
+        <h5>Credentials</h5>
+        <p>
+            Username: <strong>guest</strong><br/>
+            Password: <strong>guest</strong>
+        </p>
+
+        <h5>Dashboards</h5>
+        <p>
+            To explore the RabbitMQ message queues go to <a href="http://localhost:15672/" target="_blank">RabbitMQ management dashboard</a></br>
+            RabbitMQ message queues can also be explored via  <a href="http://localhost:5555/" target="_blank">Flower</a>
+        </p>
+
+        <h2 class="mt-4">Credits</h2>
+        <p>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a></p>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
 </body>
 </html>
