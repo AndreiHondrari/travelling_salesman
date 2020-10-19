@@ -3,6 +3,7 @@ ipdb = "*"
 flake8 = "*"
 pytest-cov = "*"
 pytest-mock = "*"
+faker = "*"
 
 [packages]
 celery = "*"
