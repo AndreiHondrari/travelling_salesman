@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  # Optimisation Web Service
   web:
     build:
       context: web
@@ -10,23 +11,86 @@ services:
       - optimisation_service
       - bugsbunny
 
+    environment:
+      DJANGO_SETTINGS_MODULE: optimisation_web.settings
+      PYTHONPATH: /optimisation_web
+
+    ports:
+      - 8000:8000
+
+    networks:
+      - db
+      - messagequeue
+
+    environment:
+      PYTHONPATH: /optimisation_web
+
+    volumes:
+      - ./web/:/optimisation_web
+
+    command: python manage.py runserver 0.0.0.0:8000
+
+    stdin_open: true
+    tty: true
+
+  # Optimisation web service - celery worker
+  celery:
+    build:
+      context: web
+
     networks:
       - db
       - messagequeue
 
     volumes:
-      - ./web/optimisation_web:/optimisation_web
+      - ./web/:/optimisation_web
 
+    depends_on:
+      - bugsbunny
+      - db
+
+    command: celery -A optimisation_web.celery.app worker -l INFO
+
+    stdin_open: true
+    tty: true
+
+  # Optimisation web service - celery beat
+  celery_beat:
+    build:
+      context: web
+
+    networks:
+      - db
+      - messagequeue
+
+    volumes:
+      - ./web/:/optimisation_web
+
+    depends_on:
+      - bugsbunny
+      - db
+
+    command: celery -A optimisation_web.celery.app beat -l INFO
+
+    stdin_open: true
+    tty: true
+
+  # Optimisation web service - database
   db:
     image: postgres
-    restart: always
 
     environment:
+      POSTGRES_DB: optimisation
+      POSTGRES_USER: optimisation
       POSTGRES_PASSWORD: topsecret
+
+    ports:
+      - 5432:5432
 
     networks:
       - db
 
+  # Optimisation service - celery worker
   optimisation_service:
     build:
       context: optimisation_service
@@ -35,15 +99,16 @@ services:
       - bugsbunny
 
     environment:
-      - PYTHONPATH=/code/offsec_platform
+      - PYTHONPATH=/optimisation_service
       - C_FORCE_ROOT=true
 
     networks:
       - messagequeue
 
     volumes:
-      - ./optimisation_service/worker:/worker
+      - ./optimisation_service:/optimisation_service
 
+  # Message queue broker
   bugsbunny:
     image: rabbitmq:3-management
 
@@ -57,19 +122,24 @@ services:
     volumes:
       - bugsbunny_data:/data
 
+  # Message queue broker - monitoring
   flower:
     image: mher/flower
 
     environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbit:5672//
+      - CELERY_BROKER_URL=amqp://guest:guest@bugsbunny
       - FLOWER_PORT=5555
 
     ports:
       - 5555:5555
 
+    networks:
+      - messagequeue
+
     depends_on:
       - bugsbunny
 
+  # Caching backend
   redis:
     image: redis:6.0
 

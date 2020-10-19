@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'spqeqjhbytsyv=f*s1o7=y3(s@nl2*)c-hv1wmj#7od@)agd1)'
+SECRET_KEY = '2uxp9qq35ep-ujb!g)$rxr%(y2#6(u2)^q0xzza+qg7d3ovw*t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'rest_framework',
+    'rest_framework.authtoken',
+
+    'intro',
+    'jobs',
 ]
 
 MIDDLEWARE = [
@@ -75,8 +81,11 @@ WSGI_APPLICATION = 'optimisation_web.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': 'db',
+        'NAME': 'optimisation',
+        'USER': 'optimisation',
+        'PASSWORD': 'topsecret'
     }
 }
 
@@ -118,3 +127,32 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# REST settings
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
+
+# Celery settings
+
+CELERY_OPTIMISATION_BROKER_URL = "amqp://guest:guest@bugsbunny"
+CELERY_OPTIMISATION_RESULT_BACKEND = "rpc://"
+CELERY_OPTIMISATION_EXPIRES = "500"
+CELERY_OPTIMISATION_TASK_DEFAULT_QUEUE = "optimisation_shortest_path_queue"
+
+CELERY_BROKER_URL = "amqp://guest:guest@bugsbunny"
+CELERY_RESULT_BACKEND = "rpc://"
+CELERY_EXPIRES = "500"
+
+if DEBUG:
+    INSTALLED_APPS += [
+        'django_extensions',
+    ]

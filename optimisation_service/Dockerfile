@@ -1,13 +1,15 @@
 FROM python:3.9
 
-RUN python -m pip install --upgrade pip
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-RUN python -m pip install pipenv
-COPY Pipfile* /tmp/
-RUN cd /tmp && python -m pipenv install --system --dev
+RUN pip install --upgrade pip
+RUN pip install pipenv
 
-COPY worker /worker
+WORKDIR /optimisation_service
 
-WORKDIR /worker
+COPY . /optimisation_service
 
-CMD python -m celery -A optimisation_worker worker
+RUN pipenv install --system --dev
+
+CMD celery -A worker.optimisation_worker worker -l INFO

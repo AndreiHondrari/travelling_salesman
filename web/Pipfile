@@ -1,18 +1,18 @@
-[[source]]
-name = "pypi"
-url = "https://pypi.org/simple"
-verify_ssl = true
-
 [dev-packages]
 ipdb = "*"
 pytest = "*"
 pytest-xdist = "*"
 pytest-django = "*"
 faker = "*"
+flake8 = "*"
 
 [packages]
+psycopg2 = "*"
 django = "*"
 djangorestframework = "*"
+celery = "*"
+django-extensions = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3.9"

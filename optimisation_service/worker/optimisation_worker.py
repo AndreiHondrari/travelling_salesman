@@ -1,20 +1,18 @@
-import logging
 from collections import namedtuple
-from typing import Callable, Union, Dict
+from typing import Callable, Dict, Union
 
 from celery import Celery
+from celery.utils.log import get_task_logger
+from ortools.constraint_solver import pywrapcp, routing_enums_pb2
 
-from ortools.constraint_solver import routing_enums_pb2
-from ortools.constraint_solver import pywrapcp
-
-import shortest_path
+from worker import shortest_path
 
 VehicleResult = namedtuple('VehicleResult', ['total_distance', 'route'])
 
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 app = Celery('optimisation_service')
-app.config_from_object('celeryconfig')
+app.config_from_object('worker.celeryconfig')
 
 logger.info("---- OPTIMISATION SERVICE ----")
 
@@ -58,11 +56,13 @@ def get_vehicles_routes(manager, routing, solution, num_vehicles) -> Dict[int, V
             route_nodes.append((location_index, distance_between_nodes,))
 
         vehicles_routes[vehicle_id] = VehicleResult(total_distance=route_distance, route=route_nodes)
-        return vehicles_routes
+
+    return vehicles_routes
 
 
 @app.task(name='optimisation.calculate_shortest_path')
 def calculate_shortest_path(locations, num_vehicles, depot=0):
+    logger.info(f"Request for: {locations}")
     locations_distances_result = shortest_path.generate_distance_matrix(locations)
 
     # create routing index manager
@@ -105,15 +105,12 @@ def calculate_shortest_path(locations, num_vehicles, depot=0):
 
     """
     Format of the response:
-    
     {
         'indexed_locations': [
             [<location index>, <location coordinates tuple>],
             ...
         ],
-        
         'starting_location': <location index of the starting point / depot>,
-        
         'routes': [
             {
                 'vehicle_index': <vehicle index>,
@@ -123,10 +120,9 @@ def calculate_shortest_path(locations, num_vehicles, depot=0):
                     ...
                 ]
             },
-            ...   
+            ...
         ]
     }
-    
     """
 
     return {
