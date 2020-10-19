@@ -47,6 +47,8 @@ services:
       - bugsbunny
       - db
 
+    command: celery -A optimisation_web.celery.app worker -l INFO
+
     stdin_open: true
     tty: true
 
