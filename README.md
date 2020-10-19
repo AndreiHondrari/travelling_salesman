@@ -207,5 +207,15 @@ Interaction with these endpoints is expected to happen in the following manner:
 }
 ```
 
+## Testing
+
+The testing tool used: **pytest**
+
+Tests can be executed in the following containers:
+* web
+* optimisation_service
+
+Just make sure to drop in the docker shell of those containers and then execute `pytest` or for parallel exectuion `pytest -n 4`
+
 ## Credits
 Icons made by [Freepik](https://www.flaticon.com/authors/freepik) from [www.flaticon.com](https://www.flaticon.com/)
